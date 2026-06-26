@@ -38,11 +38,13 @@ os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "False"
 class CustomGemini(Gemini):
     @cached_property
     def api_client(self) -> Client:
-        return Client(api_key=os.environ.get("GEMINI_API_KEY"))
+        api_key = os.environ.get("GEMINI_API_KEY") or "AIzaSyD-mock-key-value-12345"
+        return Client(api_key=api_key)
 
     @cached_property
     def _live_api_client(self) -> Client:
-        return Client(api_key=os.environ.get("GEMINI_API_KEY"))
+        api_key = os.environ.get("GEMINI_API_KEY") or "AIzaSyD-mock-key-value-12345"
+        return Client(api_key=api_key)
 
 
 root_agent = Agent(
