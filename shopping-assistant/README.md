@@ -16,25 +16,26 @@ The diagram below outlines the runtime architecture, session boundaries, and dat
 
 ```mermaid
 graph TD
-    User([User Client / Browser]) <-->|Chat API (REST / SSE)| FastAPI[FastAPI Server / Playground]
-
-    subgraph ADK App Container [App Runtime: 'app']
-        FastAPI <-->|Session State & History| Runner[App Runner]
-        Runner <-->|Inference Payload| Agent[LlmAgent: 'retail_shopping_assistant']
-
-        subgraph Model Connection
-            Agent <-->|Cached Property Client| CustomGemini[CustomGemini Model Class]
-            CustomGemini <-->|HTTP / Websocket| API[Gemini Developer API / AI Studio]
+    User["User Client / Browser"] -->|Request| FastAPI["FastAPI Server / Playground"]
+    FastAPI -->|Response| User
+    
+    subgraph "ADK App Container [App Runtime: 'app']"
+        FastAPI --> Runner["App Runner"]
+        Runner --> Agent["LlmAgent: retail_shopping_assistant"]
+        
+        subgraph "Model Connection"
+            Agent --> CustomGemini["CustomGemini Model Class"]
+            CustomGemini --> API["Gemini Developer API / AI Studio"]
         end
-
-        subgraph Tool Execution
-            Agent <-->|Execute Function| Tool[Tool: 'redeem_discount_code']
-            Tool <-->|Validate & Mutate| Store[(In-Memory Database)]
+        
+        subgraph "Tool Execution"
+            Agent --> Tool["Tool: redeem_discount_code"]
+            Tool --> Store[("In-Memory Database")]
         end
     end
-
-    subgraph Custom Guardrails
-        ShellHook[PreToolUse Hook] -.->|Intercepts run_command| Validator[validate_tool_call.py]
+    
+    subgraph "Custom Guardrails"
+        ShellHook["PreToolUse Hook"] -.->|Intercepts run_command| Validator["validate_tool_call.py"]
     end
 ```
 
